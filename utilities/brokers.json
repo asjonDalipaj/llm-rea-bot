@@ -1,0 +1,12 @@
+{
+    "brokers":[
+       {
+          "name": "YourHouse",
+          "domain": "https://your-house.nl",
+          "url": "https://your-house.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&orderby=10&orderdescending=true",
+          "listing_selector":"article[class*=\"object\"]",
+          "next_button_selector": "",
+          "cookie_modal_selector": ""
+       }
+    ]
+ }
