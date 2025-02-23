@@ -9,13 +9,14 @@ def create_extraction_instruction(is_single_listing: bool = False) -> str:
         Extract these property fields from the HTML:
         - address: Property address
         - price: Number only
-        - area: Number only (m²)
+        - area: Number only
         - bedrooms: Number only
         - energy_label: Letter A-G
         - furnished: "true"/"false"
         - including_bills: "true"/"false"
         - status: "available"/"rented"/"option"
         - available_from: YYYY-MM-DD
+        - utl: Property URL
 
         Return a single JSON object.
         """
@@ -24,13 +25,14 @@ def create_extraction_instruction(is_single_listing: bool = False) -> str:
         For each property listing, extract:
         - address: Property address
         - price: Number only
-        - area: Number only (m²)
+        - area: Number only
         - bedrooms: Number only
         - energy_label: Letter A-G
         - furnished: "true"/"false"
         - including_bills: "true"/"false"
         - status: "available"/"rented"/"option"
         - available_from: YYYY-MM-DD
+        - utl: Property URL
 
         Return a JSON array of objects.
         """

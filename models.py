@@ -12,6 +12,7 @@ class Property(BaseModel):
     including_bills: Optional[str] = "false"
     status: Optional[str] = "available"
     available_from: Optional[str] = ""
+    url: Optional[str] = ""
 
 class BrokerConfig:
     """Configuration for a broker"""

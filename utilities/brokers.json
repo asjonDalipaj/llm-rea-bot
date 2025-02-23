@@ -1,18 +1,10 @@
 {
    "brokers":[
       {
-         "name": "YourHouse",
-         "domain": "https://your-house.nl",
-         "url": "https://your-house.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&orderby=10&orderdescending=true",
-         "listing_selector":"article[class*=\"object\"]",
-         "next_button_selector": "",
-         "cookie_modal_selector": ""
-      },
-      {
          "name":"Pararius",
          "domain":"https://www.pararius.nl",
          "url":"https://www.pararius.nl/huurwoningen/{area}/0-{max_price}",
-         "listing_selector":"li.search-list__item--listing:has(span.listing-label--new)",
+         "listing_selector":"li.search-list__item--listing",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -25,7 +17,7 @@
          "cookie_modal_selector":""
       },
       {
-         "name": "It's housing",
+         "name": "ItsHousing",
          "domain": "https://itshousing.nl",
          "url": "https://itshousing.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&pricerange.minprice=500&pricerange.maxprice={max_price}",
          "listing_selector":"article.objectcontainer:has(span.new_forrent)",
@@ -180,7 +172,7 @@
          "name": "donnevastgoed",
          "domain": "https://www.donnevastgoed.nl/",
          "url": "https://www.donnevastgoed.nl/aanbod",
-         "listing_selector":"a.object-a-more",
+         "listing_selector":"div.object-element1",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -324,12 +316,12 @@
          "name": "YourHouse",
          "domain": "https://your-house.nl",
          "url": "https://your-house.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&orderby=10&orderdescending=true",
-         "listing_selector":"article[class*=\"objectcontainer\"]",
+         "listing_selector":"article[class*=\"object\"]",
          "next_button_selector": "",
          "cookie_modal_selector": ""
       },
       {
-         "name":"Covers Wonen",
+         "name":"CoversWonen",
          "domain":"https://coverswonen.nl",
          "url":"https://coverswonen.nl/en/properties/rent",
          "listing_selector":"div[class=\"thumbs-item thumbs-item-vertical\"]",
