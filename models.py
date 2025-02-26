@@ -23,6 +23,7 @@ class BrokerConfig:
         self.listing_selector = config.get("listing_selector", "")
         self.next_button_selector = config.get("next_button_selector", "")
         self.cookie_modal_selector = config.get("cookie_modal_selector", "")
+        self.fetch_detail_pages = config.get("fetch_detail_pages", False)
     
     def get_url(self, area: str) -> str:
         """Generate URL with the area parameter"""

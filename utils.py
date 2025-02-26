@@ -5,6 +5,27 @@ from bs4 import BeautifulSoup
 from models import BrokerConfig
 from typing import Optional, Dict
 
+def clean_url(url: str) -> str:
+    """Clean a URL by removing angle brackets and other unwanted characters"""
+    if not url:
+        return ""
+    
+    # Remove angle brackets and any HTML-like formatting
+    url = url.replace('<', '').replace('>', '')
+    
+    # Handle cases where there are quotes around the URL
+    url = url.strip('"\'')
+    
+    # Remove spaces that might be present
+    url = url.strip()
+    
+    # Remove any markdown formatting like [text](url)
+    markdown_match = re.search(r'\[(.*?)\]\((.*?)\)', url)
+    if markdown_match:
+        url = markdown_match.group(2)
+    
+    return url
+
 def load_brokers_config(config_path: str) -> Dict:
     """Load broker configurations from JSON file"""
     try:
