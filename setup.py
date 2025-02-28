@@ -46,7 +46,7 @@ OPENAI_API_KEY=your_openai_key_here
 
 # LLM Settings
 LLM_PROVIDER=groq/llama-3.1-8b-instant
-LLM_TEMPERATURE=0.1
+LLM_TEMPERATURE=0.04
 LLM_MAX_TOKENS=2000
 
 # Scraping Settings

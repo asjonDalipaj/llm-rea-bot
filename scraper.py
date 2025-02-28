@@ -1,4 +1,5 @@
 import os
+import logging
 import asyncio
 import json
 from datetime import datetime
@@ -56,7 +57,8 @@ class PropertyScraper:
                     "attribute": "href",
                     "default": ""
                 }
-            ]
+            ],
+            "overlap": 0.5  # Apply 50% overlap between listings
         }
 
     async def process_listing(self, crawler, listing_html: str, listing_url: str = "") -> Optional[Dict]:
@@ -70,7 +72,7 @@ class PropertyScraper:
                 extraction_strategy=llm_strategy,
                 cache_mode=CacheMode.BYPASS,
                 word_count_threshold=0,
-                excluded_tags=["script", "style", "noscript"],
+                excluded_tags=["script", "style", "noscript", "source", "img"],
                 remove_overlay_elements=True
             )
             
@@ -117,28 +119,13 @@ class PropertyScraper:
                                 return {"error": True, "message": "LLM returned empty list"}
                         
                         # Check if the property already has a URL
-                        if not property_data.get('url') and listing_url:
-                            property_data['url'] = listing_url
+                        if listing_url:
+                            property_data['url'] = self.broker.domain + listing_url
+                            print(f"Assigned new URL from listing_url: {property_data['url']}")
+                            cleaned_url = clean_url(property_data['url'])
+                            property_data['url'] = cleaned_url
+                            print(f"Cleaned - {property_data['url']}")
                         
-                        # Clean any URL that might be present
-                        if property_data.get('url'):
-                            property_data['url'] = clean_url(property_data['url'])
-                        
-                        # Ensure URL is absolute if it exists
-                        if property_data.get('url') and not property_data['url'].startswith(('http://', 'https://')):
-                            # Relative URL, add domain
-                            parsed_base = urlparse(self.broker.domain)
-                            base_domain = f"{parsed_base.scheme}://{parsed_base.netloc}"
-                            
-                            # Handle both with and without leading slash
-                            if property_data['url'].startswith('/'):
-                                property_data['url'] = f"{base_domain}{property_data['url']}"
-                            else:
-                                property_data['url'] = f"{base_domain}/{property_data['url']}"
-                                
-                        if property_data.get('url'):
-                            print(f"Found URL: {property_data['url']}")
-                            
                         # Add error field for tracking
                         property_data['error'] = False
                         return property_data
@@ -181,7 +168,6 @@ class PropertyScraper:
                 )
                 
                 # Fetch the main listings page with schema-based extraction
-                print(f"\nFetching and extracting listings from URL: {self.url}")
                 try:
                     initial_result = await crawler.arun(
                         url=self.url,

@@ -3,40 +3,28 @@ from crawl4ai.extraction_strategy import LLMExtractionStrategy
 from models import Property
 from urllib.parse import urljoin, urlparse
 
-def create_extraction_instruction(is_single_listing: bool = False) -> str:
+def create_extraction_instruction(html_fragment: str) -> str:
     """Create instruction prompt for LLM extraction"""
-    if is_single_listing:
-        return """
-        Extract these property fields from the HTML:
-        - address: Full property address as text
-        - price: Monthly rent amount as string (e.g. "1250")
-        - area: Size of property as string (e.g. "75 m²")
-        - bedrooms: Number of rooms/bedrooms as string (e.g. "2 kamers")
-        - energy_label: Energy efficiency label as string (e.g. "A")
-        - furnished: "true" or "false" as string
-        - including_bills: "true" or "false" as string
-        - status: Property status as string ("available", "rented", "option")
-        - available_from: Availability date as string
-        - url: The property detail page URL - IMPORTANT: Find the listing URL in the HTML (likely an <a> tag with href attribute)
+    instruction = f"""
+    Extract these property fields from the HTML:
+    - address: Full property address as text
+    - price: Numbers only, monthly rent amount as string (e.g. "1250")
+    - area: Numbers only, size of property as string (e.g. "75")
+    - bedrooms: Numbers only! (e.g. "2")
+    - energy_label: String only, Energy efficiency label as string (e.g. "A")
+    - furnished: "true" or "false" as string
+    - including_bills: "true" or "false" as string
+    - status: Property status as string ("available", "rented", "option")
+    - available_from: Availability date as string
+    - url: The property detail page URL - IMPORTANT: Find the listing URL in the HTML (likely an <a> tag with href attribute)
 
-        Return a single JSON object with these fields. Keep all values as strings.
-        """
-    else:
-        return """
-        For each property listing, extract:
-        - address: Full property address as text
-        - price: Monthly rent amount as string (e.g. "1250")
-        - area: Size of property as string (e.g. "75 m²")
-        - bedrooms: Number of rooms/bedrooms as string (e.g. "2 kamers")
-        - energy_label: Energy efficiency label as string (e.g. "A")
-        - furnished: "true" or "false" as string
-        - including_bills: "true" or "false" as string
-        - status: Property status as string ("available", "rented", "option")
-        - available_from: Availability date as string
-        - url: The property detail page URL - IMPORTANT: Find the listing URL in the HTML (likely an <a> tag with href attribute)
-        
-        Return a JSON object only. Keep all values as strings.
-        """
+    The HTML fragment is: 
+    {html_fragment}
+
+    Return a single JSON object with these fields. Keep all values as strings.
+    """
+    
+    return instruction
 
 def ensure_full_url(base_url: str, url: str) -> str:
     """Ensure the URL is fully qualified, adding the base URL if necessary."""
@@ -75,16 +63,13 @@ def get_llm_strategy(base_url: str, html_fragment: str = "") -> LLMExtractionStr
     provider = os.getenv('LLM_PROVIDER', 'groq/llama-3.1-8b-instant')
     api_token = os.getenv('GROQ_API_KEY') or os.getenv('ANTHROPIC_API_KEY') or os.getenv('OPENAI_API_KEY')
 
-    # Construct extraction instruction - keep it concise to reduce tokens
-    instruction = create_extraction_instruction(bool(html_fragment))
-
     # Use optimized parameters according to best practices
     strategy = LLMExtractionStrategy(
         provider=provider,
         api_token=api_token,
         schema=Property.model_json_schema(),
         extraction_type="schema",
-        instruction=instruction,
+        instruction=create_extraction_instruction(html_fragment),
         chunk_token_threshold=1000,
         overlap_rate=0.05,
         apply_chunking=True,
