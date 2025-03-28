@@ -62,11 +62,30 @@ class PropertyScraper:
         }
 
     async def process_listing(self, crawler, listing_html: str, listing_url: str = "") -> Optional[Dict]:
-        """Process a single listing with LLM"""
+        """Process a single listing with LLM, including linked page content"""
         try:
+            # Fetch the linked page content if a URL is provided
+            linked_page_content = ""
+            print(f"Init - {listing_url}")
+            if listing_url:
+                full_url = self.broker.domain + listing_url
+                print(f"Fetching linked page: {full_url}")
+                try:
+                    linked_page_result = await crawler.arun(url=full_url)
+                    if linked_page_result.success:
+                        linked_page_content = linked_page_result.html
+                        print(f"Successfully fetched linked page content for: {full_url}")
+                    else:
+                        print(f"Failed to fetch linked page: {linked_page_result.error_message}")
+                except Exception as e:
+                    print(f"Error fetching linked page: {str(e)}")
+
+            # Combine the original listing HTML with the linked page content
+            combined_html = listing_html + "\n\n" + linked_page_content
+
             # Create LLM strategy with broker domain
-            llm_strategy = get_llm_strategy(self.broker.domain, listing_html)
-            
+            llm_strategy = get_llm_strategy(self.broker.domain, combined_html)
+
             # Create crawler configuration
             config = CrawlerRunConfig(
                 extraction_strategy=llm_strategy,
@@ -75,16 +94,16 @@ class PropertyScraper:
                 excluded_tags=["script", "style", "noscript", "source", "img"],
                 remove_overlay_elements=True
             )
-            
+
             # Handle rate limiting
             max_retries = 3
             current_retry = 0
-            
+
             while current_retry < max_retries:
                 try:
-                    # Use raw_html instead of temporary file
+                    # Use combined HTML for LLM processing
                     result = await crawler.arun(
-                        raw_html=listing_html,
+                        raw_html=combined_html,
                         url=self.broker.domain,  # Used for resolving relative URLs
                         config=config
                     )
@@ -93,7 +112,7 @@ class PropertyScraper:
                     error_str = str(e).lower()
                     if "rate limit" in error_str or "ratelimit" in error_str:
                         wait_time = parse_rate_limit_error(error_str)
-                        
+
                         current_retry += 1
                         if current_retry < max_retries:
                             print(f"Rate limit reached. Waiting {wait_time:.1f} seconds before retry {current_retry}/{max_retries}...")
@@ -103,13 +122,13 @@ class PropertyScraper:
                             raise
                     else:
                         raise
-            
+
             # Process the result
             if result.success and result.extracted_content:
                 if isinstance(result.extracted_content, str):
                     try:
                         property_data = json.loads(result.extracted_content)
-                        
+
                         # Handle case where LLM returns a list instead of a single object
                         if isinstance(property_data, list):
                             if property_data:
@@ -117,15 +136,15 @@ class PropertyScraper:
                             else:
                                 print("LLM returned an empty list")
                                 return {"error": True, "message": "LLM returned empty list"}
-                        
+
                         # Check if the property already has a URL
                         if listing_url:
                             property_data['url'] = self.broker.domain + listing_url
-                            print(f"Assigned new URL from listing_url: {property_data['url']}")
+                            # print(f"Assigned new URL from listing_url: {property_data['url']}")
                             cleaned_url = clean_url(property_data['url'])
                             property_data['url'] = cleaned_url
-                            print(f"Cleaned - {property_data['url']}")
-                        
+                            # print(f"Cleaned - {property_data['url']}")
+
                         # Add error field for tracking
                         property_data['error'] = False
                         return property_data
@@ -139,13 +158,13 @@ class PropertyScraper:
                         return {"error": True, "message": "JSON parsing error"}
                 else:
                     return result.extracted_content
-            
+
             return {"error": True, "message": "Extraction failed"}
         except Exception as e:
             print(f"Error processing listing: {str(e)}")
             return {"error": True, "message": str(e)}
     
-    async def scrape(self, limit: int = 1) -> List[Dict]:
+    async def scrape(self, limit: int = 5) -> List[Dict]:
         """Scrape property listings"""
         print("\n--- Starting scraping process ---")
         
