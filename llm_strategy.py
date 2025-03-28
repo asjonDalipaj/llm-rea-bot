@@ -6,24 +6,23 @@ from urllib.parse import urljoin, urlparse
 def create_extraction_instruction(html_fragment: str) -> str:
     """Create instruction prompt for LLM extraction"""
     instruction = f"""
-    Extract these property fields from the HTML:
-    - address: Full property address as text
-    - price: Numbers only, monthly rent amount as string (e.g. "1250")
-    - area: Numbers only, size of property as string (e.g. "75")
-    - bedrooms: Numbers only! (e.g. "2")
-    - energy_label: String only, Energy efficiency label as string (e.g. "A")
-    - furnished: "true" or "false" as string
-    - including_bills: "true" or "false" as string
-    - status: Property status as string ("available", "rented", "option")
-    - available_from: Availability date as string
-    - url: The property detail page URL - IMPORTANT: Find the listing URL in the HTML (likely an <a> tag with href attribute)
+    Extract the following property details from the provided HTML fragment. 
+    Return a single JSON object with these fields, keeping all values as strings:
 
-    The HTML fragment is: 
+    - **address**: Full property address (e.g., "123 Main St, City, Country").
+    - **price**: Monthly rent amount as a number string (e.g., "1250").
+    - **area**: Property size in square meters as a number string (e.g., "75").
+    - **bedrooms**: Number of bedrooms as a number string (e.g., "2").
+    - **energy_label**: Energy efficiency label (e.g., "A").
+    - **furnished**: "true" or "false" (whether the property is furnished).
+    - **including_bills**: "true" or "false" (whether bills are included).
+    - **status**: Property status (e.g., "available", "rented", "option").
+    - **available_from**: Availability date (e.g., "2025-04-01").
+    - **url**: The property detail page URL (extract from an <a> tag with an href attribute).
+
+    HTML fragment:
     {html_fragment}
-
-    Return a single JSON object with these fields. Keep all values as strings.
     """
-    
     return instruction
 
 def ensure_full_url(base_url: str, url: str) -> str:

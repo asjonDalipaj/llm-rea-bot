@@ -1,12 +1,11 @@
 import os
-import logging
 import asyncio
 import json
 from datetime import datetime
 from typing import List, Optional, Dict
-from urllib.parse import urlparse
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode, LXMLWebScrapingStrategy
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
+import html2text
 
 from models import BrokerConfig, Property
 from utils import save_properties_json, parse_rate_limit_error, clean_url
@@ -83,8 +82,19 @@ class PropertyScraper:
             # Combine the original listing HTML with the linked page content
             combined_html = listing_html + "\n\n" + linked_page_content
 
-            # Create LLM strategy with broker domain
-            llm_strategy = get_llm_strategy(self.broker.domain, combined_html)
+            # Convert combined HTML to Markdown
+            markdown_converter = html2text.HTML2Text()
+            markdown_converter.ignore_links = False  # Keep links in the Markdown
+            combined_markdown = markdown_converter.handle(combined_html)
+
+            # Save the Markdown for debugging
+            debug_file = os.path.join(self.output_dir, f"debug_markdown_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
+            with open(debug_file, 'w', encoding='utf-8') as f:
+                f.write(combined_markdown)
+            print(f"Saved combined Markdown for debugging to: {debug_file}")
+
+            # Create LLM strategy with broker domain and Markdown content
+            llm_strategy = get_llm_strategy(self.broker.domain, combined_markdown)
 
             # Create crawler configuration
             config = CrawlerRunConfig(
@@ -101,9 +111,9 @@ class PropertyScraper:
 
             while current_retry < max_retries:
                 try:
-                    # Use combined HTML for LLM processing
+                    # Use combined Markdown for LLM processing
                     result = await crawler.arun(
-                        raw_html=combined_html,
+                        raw_html=combined_markdown,
                         url=self.broker.domain,  # Used for resolving relative URLs
                         config=config
                     )
@@ -140,10 +150,8 @@ class PropertyScraper:
                         # Check if the property already has a URL
                         if listing_url:
                             property_data['url'] = self.broker.domain + listing_url
-                            # print(f"Assigned new URL from listing_url: {property_data['url']}")
                             cleaned_url = clean_url(property_data['url'])
                             property_data['url'] = cleaned_url
-                            # print(f"Cleaned - {property_data['url']}")
 
                         # Add error field for tracking
                         property_data['error'] = False
