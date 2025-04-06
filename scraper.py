@@ -1,15 +1,29 @@
 import os
 import asyncio
 import json
+import random
 from datetime import datetime
 from typing import List, Optional, Dict
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode, LXMLWebScrapingStrategy
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 import html2text
+from urllib.parse import urlparse, urljoin
 
 from models import BrokerConfig, Property
 from utils import save_properties_json, parse_rate_limit_error, clean_url
 from llm_strategy import get_llm_strategy
+
+def ensure_full_url(base_url: str, url: str) -> str:
+    """Ensure the URL is fully qualified, adding the base URL if necessary."""
+    if not url:
+        return ""
+        
+    # Check if the URL is already absolute (has scheme and domain)
+    parsed_url = urlparse(url)
+    if not parsed_url.netloc:
+        # If the URL is relative, join it with the base URL
+        return urljoin(base_url, url)
+    return url
 
 class PropertyScraper:
     def __init__(self, broker: BrokerConfig, area: str, debug: bool = False):
@@ -67,7 +81,8 @@ class PropertyScraper:
             linked_page_content = ""
             print(f"Init - {listing_url}")
             if listing_url:
-                full_url = self.broker.domain + listing_url
+                # Ensure the listing URL is fully qualified
+                full_url = ensure_full_url(self.broker.domain, listing_url)
                 print(f"Fetching linked page: {full_url}")
                 try:
                     linked_page_result = await crawler.arun(url=full_url)
@@ -149,7 +164,7 @@ class PropertyScraper:
 
                         # Check if the property already has a URL
                         if listing_url:
-                            property_data['url'] = self.broker.domain + listing_url
+                            property_data['url'] = ensure_full_url(self.broker.domain, listing_url)
                             cleaned_url = clean_url(property_data['url'])
                             property_data['url'] = cleaned_url
 
@@ -235,8 +250,8 @@ class PropertyScraper:
                     
                     # Add delay between requests to avoid rate limits
                     if i > 0:
-                        delay = 20  # 20 seconds between requests
-                        print(f"Waiting {delay} seconds before processing next listing...")
+                        delay = random.uniform(5, 20)
+                        print(f"Waiting {delay:.2f} seconds before processing next listing...")
                         await asyncio.sleep(delay)
                     
                     # Get the HTML content and URL of this listing
