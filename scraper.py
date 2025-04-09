@@ -8,9 +8,8 @@ from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 import html2text
 from urllib.parse import urlparse, urljoin
-
 from models import BrokerConfig, Property
-from utils import save_properties_json, parse_rate_limit_error, clean_url
+from utils import save_properties_json, parse_rate_limit_error, clean_url, save_properties_to_db
 from llm_strategy import get_llm_strategy
 
 def ensure_full_url(base_url: str, url: str) -> str:
@@ -187,7 +186,7 @@ class PropertyScraper:
             print(f"Error processing listing: {str(e)}")
             return {"error": True, "message": str(e)}
     
-    async def scrape(self, limit: int = 5) -> List[Dict]:
+    async def scrape(self, limit: int = 10) -> List[Dict]:
         """Scrape property listings"""
         print("\n--- Starting scraping process ---")
         
@@ -273,6 +272,7 @@ class PropertyScraper:
                 
                 # Save results
                 if properties:
+                    # Save to JSON file
                     filename = save_properties_json(
                         properties=properties,
                         broker_name=self.broker.name,
@@ -280,7 +280,10 @@ class PropertyScraper:
                         output_dir=self.output_dir
                     )
                     print(f"Results saved to: {filename}")
-                
+                    
+                    # Save to database
+                    await save_properties_to_db(properties, self.broker.name)
+
                 return properties
 
             except Exception as e:

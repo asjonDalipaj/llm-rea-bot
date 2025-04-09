@@ -3,7 +3,8 @@ import json
 import re
 from bs4 import BeautifulSoup
 from models import BrokerConfig
-from typing import Optional, Dict
+from typing import Optional, Dict, List
+import httpx
 
 def clean_url(url: str) -> str:
     """Clean a URL by removing angle brackets and other unwanted characters"""
@@ -103,3 +104,34 @@ def parse_rate_limit_error(error_str: str) -> float:
     """Parse wait time from rate limit error message"""
     wait_time_match = re.search(r'try again in (\d+\.?\d*)s', error_str.lower())
     return float(wait_time_match.group(1)) if wait_time_match else 30
+
+async def save_properties_to_db(properties: List[Dict], broker_name: str) -> None:
+    """Save properties to database via API endpoint"""
+    api_url = os.getenv('API_URL', 'http://localhost:8000')
+    
+    async with httpx.AsyncClient() as client:
+        for prop in properties:
+            if prop.get('error'):
+                continue
+            
+            try:
+                response = await client.post(
+                    f"{api_url}/properties/",
+                    json={
+                        "address": prop.get('address'),
+                        "price": prop.get('price'),
+                        "area": prop.get('area'),
+                        "bedrooms": prop.get('bedrooms'),
+                        "energy_label": prop.get('energy_label'),
+                        "furnished": prop.get('furnished', 'false').lower() == 'true',
+                        "including_bills": prop.get('including_bills', 'false').lower() == 'true',
+                        "status": prop.get('status'),
+                        "available_from": prop.get('available_from'),
+                        "url": prop.get('url'),
+                        "broker": broker_name
+                    }
+                )
+                response.raise_for_status()
+                print(f"✓ Saved property to database: {prop.get('address')}")
+            except Exception as e:
+                print(f"✗ Error saving property to database: {str(e)}")
