@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
-from mongoengine import connect, disconnect
+from fastapi import FastAPI, HTTPException, Query
+from mongoengine import connect, disconnect, Q
 from .mongo_models import PropertyListing
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 import os
 
@@ -69,15 +69,33 @@ async def create_property(property: PropertyBase):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/properties/", response_model=List[PropertyBase])
-async def get_properties(broker: str | None = None, limit: int = 10):
+async def search_properties(
+    address: Optional[str] = Query(None, description="Search by address"),
+    broker: Optional[str] = Query(None, description="Filter by broker"),
+    limit: int = Query(10, gt=0, le=100, description="Maximum number of results")
+):
+    """
+    Search properties with optional filters:
+    - address: Case-insensitive partial match
+    - broker: Exact match
+    - limit: Maximum number of results to return
+    """
     try:
-        query = {}
+        # Build query
+        query = Q()
+        if address:
+            query &= Q(address__icontains=address)
         if broker:
-            query["broker"] = broker
-            
-        properties = PropertyListing.objects(**query).limit(limit)
+            query &= Q(broker=broker)
+
+        # Execute query
+        properties = PropertyListing.objects(query).limit(limit)
+        
+        # Convert to response model
         return [PropertyBase.model_validate(prop.to_mongo()) for prop in properties]
+        
     except Exception as e:
+        print(f"Search error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/properties/{property_url}", response_model=PropertyBase)

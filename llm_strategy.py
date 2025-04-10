@@ -44,16 +44,6 @@ def ensure_full_url(base_url: str, url: str) -> str:
             return urljoin(base_url, url)
     return url
 
-def post_process_property_data(data, base_url):
-    """Post-process the property data to ensure full URLs."""
-    if isinstance(data, dict):
-        if 'url' in data and data['url']:
-            data['url'] = ensure_full_url(base_url, data['url'])
-    elif isinstance(data, list):
-        for item in data:
-            post_process_property_data(item, base_url)
-    return data
-
 def get_llm_strategy(base_url: str, html_fragment: str = "") -> LLMExtractionStrategy:
     """Create LLM extraction strategy with proper configuration"""
     print("Creating LLM strategy...")
@@ -77,7 +67,6 @@ def get_llm_strategy(base_url: str, html_fragment: str = "") -> LLMExtractionStr
             "temperature": float(os.getenv('LLM_TEMPERATURE', 0.1)),
             "max_tokens": int(os.getenv('LLM_MAX_TOKENS', 2000))
         },
-        post_process_fn=lambda data: post_process_property_data(data, base_url),
         verbose=bool(os.getenv('DEBUG', 'False').lower() == 'true')
     )
 
