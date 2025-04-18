@@ -102,10 +102,10 @@ class PropertyScraper:
             combined_markdown = markdown_converter.handle(combined_html)
 
             # Save the Markdown for debugging
-            debug_file = os.path.join(self.output_dir, f"debug_markdown_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
-            with open(debug_file, 'w', encoding='utf-8') as f:
-                f.write(combined_markdown)
-            print(f"Saved combined Markdown for debugging to: {debug_file}")
+            # debug_file = os.path.join(self.output_dir, f"debug_markdown_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
+            # with open(debug_file, 'w', encoding='utf-8') as f:
+            #     f.write(combined_markdown)
+            # print(f"Saved combined Markdown for debugging to: {debug_file}")
 
             # Create LLM strategy with broker domain and Markdown content
             llm_strategy = get_llm_strategy(self.broker.domain, combined_markdown)
@@ -186,7 +186,7 @@ class PropertyScraper:
             print(f"Error processing listing: {str(e)}")
             return {"error": True, "message": str(e)}
     
-    async def scrape(self, limit: int = 3) -> List[Dict]:
+    async def scrape(self, limit: int = 5) -> List[Dict]:
         """Scrape property listings"""
         print("\n--- Starting scraping process ---")
         
@@ -230,14 +230,14 @@ class PropertyScraper:
                 listings_data = json.loads(initial_result.extracted_content)
                 print(f"\nFound {len(listings_data)} property listings using selector: {self.broker.listing_selector}")
                 
-                if not listings_data:
-                    print("No listings found! Check the selector or page structure.")
-                    # Save debug info
-                    debug_file = os.path.join(self.output_dir, f"debug_html_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html")
-                    with open(debug_file, 'w', encoding='utf-8') as f:
-                        f.write(initial_result.html)
-                    print(f"Saved full HTML for debugging to: {debug_file}")
-                    return []
+                # if not listings_data:
+                #     print("No listings found! Check the selector or page structure.")
+                #     # Save debug info
+                #     debug_file = os.path.join(self.output_dir, f"debug_html_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html")
+                #     with open(debug_file, 'w', encoding='utf-8') as f:
+                #         f.write(initial_result.html)
+                #     print(f"Saved full HTML for debugging to: {debug_file}")
+                #     return []
                 
                 # Step 2: Process each listing individually
                 print("\nProcessing individual listings...")
@@ -249,7 +249,7 @@ class PropertyScraper:
                     
                     # Add delay between requests to avoid rate limits
                     if i > 0:
-                        delay = random.uniform(5, 20)
+                        delay = random.uniform(5, 10)
                         print(f"Waiting {delay:.2f} seconds before processing next listing...")
                         await asyncio.sleep(delay)
                     

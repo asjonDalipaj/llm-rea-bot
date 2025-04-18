@@ -2,7 +2,7 @@ import os
 import json
 import re
 from bs4 import BeautifulSoup
-from models import BrokerConfig
+from models import BrokerConfig, ScrapingResult
 from typing import Optional, Dict, List
 import httpx
 from datetime import datetime
@@ -132,13 +132,46 @@ def ensure_full_url(base_url: str, url: str) -> str:
 
 def clean_property_data(data: Dict, base_url: str = "") -> Dict:
     """Clean and validate property data according to schema requirements"""
-    
-    def clean_price(price: str) -> str:
-        """Extract numbers from price string"""
+
+    def clean_price(price: Optional[str]) -> Optional[str]:
+        """
+        Cleans a European-formatted price string (e.g., "€ 1.924,90 /mnd")
+        and returns the numeric part as a standard string (e.g., "1924.90").
+
+        Handles:
+        - Currency symbols and other non-numeric text.
+        - European thousands separators ('.').
+        - European decimal separator (',').
+        - Leading/trailing whitespace.
+
+        Args:
+            price: The price string to clean.
+
+        Returns:
+            The cleaned price number as a string (using '.' as decimal separator),
+            or None if the input is None, empty, or no valid number is found.
+        """
         if not price:
-            return ""
-        numbers = re.findall(r'\d+', str(price))
-        return numbers[0] if numbers else ""
+            return None
+
+        # 1. Remove European thousands separators (dots)
+        #    Must be done BEFORE replacing the comma decimal separator.
+        no_thousands = price.replace('.', '')
+
+        # 2. Replace the European decimal separator (comma) with a standard dot
+        standard_decimal = no_thousands.replace(',', '.')
+
+        # 3. Extract the first valid number string (integer or float format) using regex
+        #    This finds sequences of digits, optionally followed by a dot and more digits.
+        match = re.search(r'\d+(\.\d+)?', standard_decimal)
+
+        if match:
+            # 4. Return the matched number string directly
+            number_str = match.group(0)
+            return number_str
+        else:
+            # No numeric pattern found after cleaning
+            return None
     
     def clean_area(area: str) -> str:
         """Extract number from area string"""
@@ -164,9 +197,8 @@ def clean_property_data(data: Dict, base_url: str = "") -> Dict:
     
     def clean_status(status: str) -> str:
         """Validate status against allowed values"""
-        valid_statuses = ['available', 'rented', 'option']
         status = str(status).lower() if status else 'available'
-        return status if status in valid_statuses else 'available'
+        return status
     
     def clean_date(date_str: str) -> str:
         """Validate and format date string"""
@@ -223,3 +255,40 @@ async def save_properties_to_db(properties: List[Dict], broker_name: str) -> Non
             except Exception as e:
                 print(f"✗ Error saving property to database: {str(e)}")
                 print(f"Original property data: {prop}")
+
+def save_scraping_report(results: List[ScrapingResult], output_dir: str) -> str:
+    """Save scraping results report"""
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = os.path.join(output_dir, f"scraping_report_{timestamp}.md")
+    
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write("# Property Scraping Report\n\n")
+        f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        
+        # Summary stats
+        total_brokers = len(results)
+        failed_brokers = len([r for r in results if not r.success])
+        f.write(f"## Summary\n")
+        f.write(f"- Total brokers attempted: {total_brokers}\n")
+        f.write(f"- Failed brokers: {failed_brokers}\n")
+        f.write(f"- Success rate: {((total_brokers-failed_brokers)/total_brokers)*100:.1f}%\n\n")
+        
+        # Failed brokers
+        if failed_brokers > 0:
+            f.write("## Failed Brokers\n")
+            for result in results:
+                if not result.success:
+                    f.write(f"\n### {result.broker_name}\n")
+                    f.write(f"Error: {result.error_message}\n")
+        
+        # Successful brokers
+        f.write("\n## Successful Brokers\n")
+        for result in results:
+            if result.success:
+                f.write(f"\n### {result.broker_name}\n")
+                f.write(f"- Properties found: {result.properties_found}\n")
+                f.write(f"- Properties saved: {result.properties_saved}\n")
+                f.write(f"- Time taken: {result.time_taken:.1f} seconds\n")
+    
+    return filename

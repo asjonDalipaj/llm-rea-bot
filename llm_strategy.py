@@ -49,7 +49,7 @@ def get_llm_strategy(base_url: str, html_fragment: str = "") -> LLMExtractionStr
     print("Creating LLM strategy...")
 
     # Get provider and API key from env
-    provider = os.getenv('LLM_PROVIDER', 'groq/llama-3.1-8b-instant')
+    provider = os.getenv('LLM_PROVIDER', 'groq/llama-3.3-70b-versatile')
     api_token = os.getenv('GROQ_API_KEY') or os.getenv('ANTHROPIC_API_KEY') or os.getenv('OPENAI_API_KEY')
 
     # Use optimized parameters according to best practices
@@ -59,8 +59,8 @@ def get_llm_strategy(base_url: str, html_fragment: str = "") -> LLMExtractionStr
         schema=Property.model_json_schema(),
         extraction_type="schema",
         instruction=create_extraction_instruction(html_fragment),
-        chunk_token_threshold=1000,
-        overlap_rate=0.05,
+        chunk_token_threshold=800,
+        overlap_rate=0.15,
         apply_chunking=True,
         input_format="markdown",  # Use markdown for easier processing by LLM
         extra_args={

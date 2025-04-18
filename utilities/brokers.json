@@ -11,23 +11,23 @@
       {
          "name": "amstel_housing",
          "domain": "https://www.amstelhousing.nl",
-         "url": "https://www.amstelhousing.nl/woningaanbod/huur/{area}?locationofinterest={area}&pricerange.maxprice={max_price}",
-         "listing_selector":"div.objectcontainer:has(span.new_forrent)",
+         "url": "https://www.amstelhousing.nl/woningaanbod/huur/provincie-{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&pricerange.maxprice={max_price}",
+         "listing_selector":"article.objectcontainer",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
       {
          "name": "its_housing",
          "domain": "https://itshousing.nl",
-         "url": "https://itshousing.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&pricerange.minprice=500&pricerange.maxprice={max_price}",
-         "listing_selector":"article.objectcontainer:has(span.new_forrent)",
+         "url": "https://itshousing.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&pricerange.maxprice={max_price}",
+         "listing_selector":"article.objectcontainer",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
       {
          "name": "vva",
          "domain": "https://www.vva.amsterdam",
-         "url": "https://www.vva.amsterdam/woningaanbod/huur/{area}?availability=1&locationofinterest={area}&moveunavailablelistingstothebottom=true&orderby=9&pricerange.maxprice={max_price}",
+         "url": "https://www.vva.amsterdam/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&orderby=9&pricerange.maxprice={max_price}",
          "listing_selector":"article.objectcontainer:has(span.new_forrent)",
          "next_button_selector":"",
          "cookie_modal_selector":""
@@ -45,14 +45,6 @@
          "domain": "https://livresidential.nl",
          "url": "https://livresidential.nl/huurwoningen?range%5Bprice%5D=500%3A{max_price}&refinementList%5Bcity%5D%5B0%5D={area}",
          "listing_selector":"a.flex.flex-col",
-         "next_button_selector":"",
-         "cookie_modal_selector":""
-      },
-      {
-         "name": "ma_residences",
-         "domain": "https://www.maresidences.nl/",
-         "url": "https://www.maresidences.nl/woningaanbod",
-         "listing_selector":"div.object:has(span.new_forrent)",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -107,7 +99,7 @@
       {
          "name":"burgersdijk",
          "domain":"https://burgersdijk.com/",
-         "url":"https://burgersdijk.com/huurwoningen/?in={area}&vanaf=500&tot={max_price}",
+         "url":"https://burgersdijk.com/business/huren/?tot={max_price}",
          "listing_selector":"a[data-publishedon]",
          "next_button_selector":"",
          "cookie_modal_selector":""
@@ -117,14 +109,6 @@
          "domain":"https://www.lemoo.nl/",
          "url":"https://www.lemoo.nl/woningaanbod?status=rent&city={area}&max_price={max_price}",
          "listing_selector":"div.eazlee_objects",
-         "next_button_selector":"",
-         "cookie_modal_selector":""
-      },
-      {
-         "name":"im_home",
-         "domain":"https://imhomerentals.com/",
-         "url":"https://imhomerentals.com/advanced-search-slideshow/?sort=newest",
-         "listing_selector":"a.es-listings__image__link",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -147,8 +131,8 @@
       {
          "name":"melvin",
          "domain":"https://www.melvinbloemendal.com/",
-         "url":"https://www.melvinbloemendal.com/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&orderby=10&orderdescending=true&pricerange.maxprice={max_price}",
-         "listing_selector":"div.object",
+         "url":"https://www.melvindemakelaar.nl/woningaanbod/huur?street_postcode_city={area}&rent_price_from=&rent_price_till={max_price}#objects",
+         "listing_selector":"article[class]",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -156,7 +140,7 @@
          "name": "huurflits",
          "domain": "https://huurflits.nl",
          "url": "https://huurflits.nl/woningoverzicht/zoekresultaten?search={area}&price_low=0&price_high={max_price}",
-         "listing_selector":"div[class='col-md-6 col-lg-6']:has(a:has-text('Nieuw'))",
+         "listing_selector":"div[class='col-md-6 col-lg-6']",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -193,14 +177,6 @@
          "cookie_modal_selector":""
       },
       {
-         "name": "grand_relocation",
-         "domain": "https://www.grandrelocation.nl/",
-         "url": "https://www.grandrelocation.nl/woning-aanbod?city={area}&max_price={max_price}",
-         "listing_selector":"a.houses-url",
-         "next_button_selector":"",
-         "cookie_modal_selector":""
-      },
-      {
          "name": "bns",
          "domain": "https://www.bnsrentalservice.nl",
          "url": "https://www.bnsrentalservice.nl/nl/aanbod#{{%22view%22:%22grid%22,%22sort%22:%22addedDesc%22:%22%22,%22salesRentals%22:%22rentals%22,%22salesPriceMin%22:0,%22salesPriceMax%22:{max_price},%22devSalesPriceMin%22:0,%22devSalesPriceMax%22:{max_price},%22rentalsPriceMin%22:0,%22rentalsPriceMax%22:{max_price},%22devRentalsPriceMin%22:0,%22devRentalsPriceMax%22:{max_price}:5259487,%22page%22:1}}",
@@ -209,10 +185,10 @@
          "cookie_modal_selector":""
       },
       {
-         "name": "start_housing",
-         "domain": "https://www.starthousing.nl",
-         "url": "https://www.starthousing.nl/woningaanbod/huur/{area}?locationofinterest={area}&moveunavailablelistingstothebottom=true&pricerange.maxprice={max_price}",
-         "listing_selector":"div.listgal:has(div.new_forrent)",
+         "name": "365makelaardij",
+         "domain": "https://365makelaardij.nl",
+         "url": "https://365makelaardij.nl/wonen/zoeken/{area}/?sortering=prijs-oplopend",
+         "listing_selector":"div.house-list__item",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -228,7 +204,7 @@
          "name": "eu_makelaardij",
          "domain": "https://www.eu-makelaardij.com/",
          "url": "https://www.eu-makelaardij.com/woningaanbod?offer=rent&location={area}&maxprice={max_price}",
-         "listing_selector":"div.listing-house:not(:has(span:has-text('Verhuurd')))",
+         "listing_selector":"a.eazlee_object",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -237,14 +213,6 @@
          "domain": "https://verkoopmakelaarbas.nl",
          "url": "https://verkoopmakelaarbas.nl/huurwoningen/",
          "listing_selector":"div.aw-card:has(span:has-text('Te huur'))",
-         "next_button_selector":"",
-         "cookie_modal_selector":""
-      },
-      {
-         "name": "housing_anywhere",
-         "domain": "https://housinganywhere.com",
-         "url": "https://housinganywhere.com/s/{area}--Netherlands?priceMax={max_price}00&bills=included&sorting=mostRecent",
-         "listing_selector":"div[class='MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-12 MuiGrid-grid-md-4 css-kiyygt']",
          "next_button_selector":"",
          "cookie_modal_selector":""
       },
@@ -259,8 +227,8 @@
       {
          "name":"funda",
          "domain":"https://www.funda.nl",
-         "url":"https://www.funda.nl/zoeken/huur?selected_area=%5B%22{area}%22%5D&search_result={page_number}&price=%22-{max_price}%22&sort=%22date_down%22",
-         "listing_selector":"div[data-test-id=\"search-result-item\"]:has(li:has-text('Nieuw'))",
+         "url":"https://www.funda.nl/zoeken/huur/?selected_area=[%22{area}%22]&price=%220-{max_price}%22",
+         "listing_selector":"div.border-b",
          "next_button_selector":"li:not(.disabled) > a > span:has-text(\"Volgende\")",
          "cookie_modal_selector":".didomi-popup-backdrop"
       },
@@ -297,18 +265,18 @@
          "cookie_modal_selector":""
       },
       {
-         "name": "wonen123",
+         "name": "123wonen",
          "domain": "https://www.123wonen.nl",
          "url": "https://www.123wonen.nl/huurwoningen/in/{area}",
-         "listing_selector":"div[class*='verhuurdovb']",
+         "listing_selector":"div[class*='nieuw']",
          "next_button_selector": "",
          "cookie_modal_selector": ""
       },
       {
-         "name":"vbo",
-         "domain":"https://www.vbo.nl",
-         "url":"https://www.vbo.nl/huurwoningen?q={area}&straal=&huurprijs_van=&huurprijs_tot={max_price}",
-         "listing_selector":"div[class=\"col-12 col-sm-6 col-lg-4\"]:has(div:has-text('nieuw'))",
+         "name":"vastgoednederland",
+         "domain":"https://aanbod.vastgoednederland.nl/",
+         "url":"https://aanbod.vastgoednederland.nl/huurwoningen?q={area}&straal=&huurprijs_van=&huurprijs_tot={max_price}",
+         "listing_selector":"div[class=\"col-12 col-sm-6 col-lg-4\"]",
          "next_button_selector":"",
          "cookie_modal_selector":"div[id=\"cookiewall\"]"
       },
@@ -339,8 +307,8 @@
       {
          "name": "wvo",
          "domain": "https://www.wvo.nl",
-         "url": "https://www.wvo.nl/aanbod/woningaanbod/-{max_price}/huur/",
-         "listing_selector":"li.al4woning:not(:has(span.bannerstatusverhuurd))",
+         "url": "https://www.wvo.nl/nl/bedrijfsaanbod/huur#{%22view%22:%22grid%22,%22sort%22:%22addedDesc%22,%22searchTerms%22:[%22address%22:%22utrecht%22,%22rentalsPriceMin%22:0,%22rentalsPriceMax%22:3000,%22devRentalsPriceMin%22:0,%22devRentalsPriceMax%22:3000,%22city%22:[]}",
+         "listing_selector":"a.consumer-card-listings",
          "next_button_selector":"",
          "cookie_modal_selector":""
       }

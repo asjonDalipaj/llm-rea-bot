@@ -39,7 +39,7 @@ The application is organized into several modules:
    OPENAI_API_KEY=your_openai_key
 
    # LLM Settings
-   LLM_PROVIDER=groq/llama-3.1-8b-instant
+   LLM_PROVIDER=groq/llama-3.3-70b-versatile
    LLM_TEMPERATURE=0.1
    LLM_MAX_TOKENS=2000
 
