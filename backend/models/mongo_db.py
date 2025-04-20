@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from mongoengine import connect, disconnect, Q
 from .mongo_models import PropertyListing
 from typing import List, Optional
@@ -6,6 +7,17 @@ from pydantic import BaseModel
 import os
 
 app = FastAPI(title="Property Scraper API")
+
+app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # MongoDB connection
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/property_scraper')
