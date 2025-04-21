@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { PropertySearch } from '@/components/PropertyScearch';
+import { useEffect, useState } from 'react';
+import Lottie from 'react-lottie';
+import { PropertySearch } from '@/components/PropertySearch';
 import { PropertyCard } from '@/components/PropertyCard';
+import animationData from '@/animations/house-search.json';
 
 interface Property {
   address: string;
@@ -44,30 +46,57 @@ export default function Home() {
     }
   };
 
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+    <div className="min-h-screen bg-[var(--background)]">
+      <div className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] py-20">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-6 text-center">
-            Find Your Next Home
-          </h1>
-          <p className="text-xl mb-8 text-center">
-            Rent a place, stay for months
-          </p>
-          <PropertySearch
-            onSearch={handleSearch}
-            brokers={['YourHouse', 'OtherBroker']} // Add your broker names here
-          />
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="md:w-1/2 mb-8 md:mb-0">
+              <h1 className="text-4xl font-bold mb-6 text-white">
+                Find Your Next Home
+              </h1>
+              <p className="text-xl mb-8 text-white/90">
+                Rent a place, stay for months
+              </p>
+              <PropertySearch
+                onSearch={handleSearch}
+                brokers={['YourHouse', 'OtherBroker']}
+              />
+            </div>
+            <div className="md:w-1/2 flex justify-center">
+              <div className="w-full max-w-md">
+                <Lottie options={defaultOptions} height={400} width={400} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Results Section */}
       <div className="container mx-auto px-4 py-12">
         {loading && (
-          <div className="text-center">Loading...</div>
+          <div className="text-center">
+            <Lottie 
+              options={{ 
+                loop: true,
+                autoplay: true,
+                animationData: animationData 
+              }}
+              height={200}
+              width={200}
+            />
+          </div>
         )}
-        
+
         {error && (
           <div className="text-red-600 text-center mb-4">{error}</div>
         )}

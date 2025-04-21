@@ -84,12 +84,14 @@ async def create_property(property: PropertyBase):
 async def search_properties(
     address: Optional[str] = Query(None, description="Search by address"),
     broker: Optional[str] = Query(None, description="Filter by broker"),
+    max_price: Optional[str] = Query(None, description="Filter by price"),
     limit: int = Query(10, gt=0, le=100, description="Maximum number of results")
 ):
     """
     Search properties with optional filters:
     - address: Case-insensitive partial match
     - broker: Exact match
+    - max_price: Filter by maximum price
     - limit: Maximum number of results to return
     """
     try:
@@ -99,6 +101,8 @@ async def search_properties(
             query &= Q(address__icontains=address)
         if broker:
             query &= Q(broker=broker)
+        if max_price:
+            query &= Q(price__lte=max_price)
 
         # Execute query
         properties = PropertyListing.objects(query).limit(limit)

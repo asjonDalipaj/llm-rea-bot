@@ -186,7 +186,7 @@ class PropertyScraper:
             print(f"Error processing listing: {str(e)}")
             return {"error": True, "message": str(e)}
     
-    async def scrape(self, limit: int = 5) -> List[Dict]:
+    async def scrape(self, limit: int = 15) -> List[Dict]:
         """Scrape property listings"""
         print("\n--- Starting scraping process ---")
         
